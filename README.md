@@ -1,1 +1,1 @@
-# egg
+# egg - the simple error aggregator
