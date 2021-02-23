@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package protos;
+option go_package = "github.com/ducc/egg/protos";
+
+import "google/protobuf/timestamp.proto";
+
+message Error {
+  string error_id = 1;
+  string message = 2;
+  string hash = 3;
+  google.protobuf.Timestamp timestamp = 4;
+  map<string, string> data = 5;
+}
+
+service Ingress {
+  rpc Ingest(IngestRequest) returns (IngestResponse);
+}
+
+message IngestRequest {
+  repeated Error errors = 1;
+}
+
+message IngestResponse {}
+
+service Egress {
+  rpc Query(QueryRequest) returns (QueryResponse);
+}
+
+message TimeFilter {
+  google.protobuf.Timestamp from = 1;
+  google.protobuf.Timestamp to = 2;
+}
+
+message FilterOperator {
+  enum Name {
+    EQ = 0;
+    NOT_EQ = 1;
+  }
+}
+
+message DataFilter {
+  string key = 1;
+  string value = 2;
+  FilterOperator.Name op = 3;
+}
+
+message Aggregation {
+  enum Name {
+    NONE = 0;
+    COUNT = 1;
+    MEAN = 2;
+  }
+}
+
+message QueryRequest {
+  message Criterion {
+    oneof criterion {
+      TimeFilter time = 1;
+      DataFilter data = 2;
+    }
+  }
+
+  repeated Criterion criteria = 1;
+  Aggregation.Name aggregation = 2;
+}
+
+message QueryResponse {
+  message Result {
+    Error error = 1;
+
+    oneof aggregation {
+      int64 count = 100;
+      int64 mean = 101;
+    }
+
+    google.protobuf.Timestamp first_seen = 200;
+    google.protobuf.Timestamp last_seen = 201;
+  }
+
+  repeated Result results = 1;
+}
