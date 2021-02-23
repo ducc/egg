@@ -19,5 +19,6 @@ func New(ctx context.Context, db *database.Database) *Server {
 }
 
 func (s *Server) Query(ctx context.Context, req *protos.QueryRequest) (*protos.QueryResponse, error) {
+
 	return nil, nil
 }
