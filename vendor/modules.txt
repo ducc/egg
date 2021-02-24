@@ -14,6 +14,7 @@ github.com/ClickHouse/clickhouse-go/lib/writebuffer
 github.com/cloudflare/golz4
 # github.com/golang/protobuf v1.4.3
 ## explicit
+github.com/golang/protobuf/jsonpb
 github.com/golang/protobuf/proto
 github.com/golang/protobuf/ptypes
 github.com/golang/protobuf/ptypes/any
@@ -22,6 +23,9 @@ github.com/golang/protobuf/ptypes/timestamp
 # github.com/google/uuid v1.1.2
 ## explicit
 github.com/google/uuid
+# github.com/gorilla/mux v1.8.0
+## explicit
+github.com/gorilla/mux
 # github.com/magefile/mage v1.10.0
 github.com/magefile/mage/mg
 github.com/magefile/mage/sh
@@ -93,12 +97,14 @@ google.golang.org/grpc/status
 google.golang.org/grpc/tap
 # google.golang.org/protobuf v1.25.0
 ## explicit
+google.golang.org/protobuf/encoding/protojson
 google.golang.org/protobuf/encoding/prototext
 google.golang.org/protobuf/encoding/protowire
 google.golang.org/protobuf/internal/descfmt
 google.golang.org/protobuf/internal/descopts
 google.golang.org/protobuf/internal/detrand
 google.golang.org/protobuf/internal/encoding/defval
+google.golang.org/protobuf/internal/encoding/json
 google.golang.org/protobuf/internal/encoding/messageset
 google.golang.org/protobuf/internal/encoding/tag
 google.golang.org/protobuf/internal/encoding/text

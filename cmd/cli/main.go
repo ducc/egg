@@ -48,7 +48,7 @@ func main() {
 
 	for _, result := range res.Results {
 		firstSeen := result.FirstSeen.AsTime().Format(time.RFC1123)
-		lastSeen := result.FirstSeen.AsTime().Format(time.RFC1123)
+		lastSeen := result.LastSeen.AsTime().Format(time.RFC1123)
 
 		fmt.Printf("%d events: %s\n    First seen: %s\n    Last seen: %s\n    Data: %s\n    Hash: %s\n\n", result.GetCount(), result.Error.Message, firstSeen, lastSeen, result.Error.Data, result.Error.Hash)
 	}

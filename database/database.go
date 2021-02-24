@@ -85,22 +85,12 @@ SELECT
 	max(timestamp) as last_seen,
 	any(data) as data,
 	count() as count 
-FROM (
-	SELECT 
-		hash,
-		error_id,
-		message,
-		timestamp,
-		data
-	FROM
-		errors
-	ORDER BY 
-		timestamp DESC
-)
+FROM 
+	errors
 GROUP BY
 	hash
 ORDER BY
-	hash`
+	count DESC`
 
 	iter, err := d.db.QueryContext(ctx, stmt)
 	if err != nil {

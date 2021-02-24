@@ -17,3 +17,7 @@ func GrpcAddress() string {
 func ClickHouseURI() string {
 	return os.Getenv("CLICKHOUSE_URI")
 }
+
+func RestAddress() string {
+	return os.Getenv("REST_ADDRESS")
+}
