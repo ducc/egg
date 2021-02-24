@@ -2,6 +2,7 @@ package goclient
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"time"
 
@@ -40,7 +41,7 @@ func WithLogger(l *logrus.Logger) Option {
 }
 
 type Client interface {
-	Error(ctx context.Context, err error, data ...map[string]fmt.Stringer)
+	Error(ctx context.Context, err error, data ...map[string]interface{})
 }
 
 type client struct {
@@ -75,11 +76,12 @@ func New(ctx context.Context, opts ...Option) (Client, error) {
 	return c, nil
 }
 
-func (c *client) Error(ctx context.Context, event error, data ...map[string]fmt.Stringer) {
+func (c *client) Error(ctx context.Context, event error, data ...map[string]interface{}) {
 	ctx, cancel := context.WithTimeout(ctx, c.ingestTimeout)
 	defer cancel()
 
 	hash := sha1.New().Sum([]byte(event.Error()))
+	hashString := base64.RawStdEncoding.EncodeToString(hash)
 
 	ts, err := ptypes.TimestampProto(time.Now())
 	if err != nil {
@@ -87,22 +89,24 @@ func (c *client) Error(ctx context.Context, event error, data ...map[string]fmt.
 		return
 	}
 
-	var newData map[string]string
+	newData := map[string]string{}
 	for _, dataMap := range data {
 		for k, v := range dataMap {
-			newData[k] = v.String()
+			newData[k] = fmt.Sprint(v)
 		}
 	}
 
+	e := &protos.Error{
+		Message:   event.Error(),
+		Hash:      hashString,
+		Timestamp: ts,
+		Data:      newData,
+	}
+
 	if _, err := c.client.Ingest(ctx, &protos.IngestRequest{
-		Errors: []*protos.Error{{
-			Message:   event.Error(),
-			Hash:      string(hash),
-			Timestamp: ts,
-			Data:      newData,
-		}},
+		Errors: []*protos.Error{e},
 	}); err != nil {
-		c.logger.WithError(err).WithField("event", event).WithField("data", data).Error("unable to send error to egg")
+		c.logger.WithError(err).WithField("event", e).WithField("data", data).Error("unable to send error to egg")
 		return
 	}
 }

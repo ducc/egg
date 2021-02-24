@@ -7,5 +7,5 @@ CREATE TABLE IF NOT EXISTS errors (
 	message TEXT NOT NULL,
 	timestamp TIMESTAMP NOT NULL,
 	data TEXT NOT NULL
-) engine=MergeTree ORDER BY hash;
+) engine=MergeTree PRIMARY KEY (error_id) ORDER BY error_id;
 `
