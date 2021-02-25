@@ -17,14 +17,21 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
       
-      - name: Docker build
+      - name: Docker build hash
         run: docker build -t duccos/egg-${{ matrix.service }}:$GITHUB_SHA -f Dockerfile.${{ matrix.service }} .
+      
+      - name: Docker build latest
+        run: docker build -t duccos/egg-${{ matrix.service }}:latest -f Dockerfile.${{ matrix.service }} .
       
       - name: Docker login
         if: github.ref == 'refs/heads/master'
         run: echo ${{ secrets.DOCKER_ACCESS_TOKEN }} | docker login -u duccos --password-stdin
 
-      - name: Docker push egg
+      - name: Docker push hash
         if: github.ref == 'refs/heads/master'
         run: docker push duccos/egg-${{ matrix.service }}:$GITHUB_SHA
+
+      - name: Docker push latest
+        if: github.ref == 'refs/heads/master'
+        run: docker push duccos/egg-${{ matrix.service }}:latest
       

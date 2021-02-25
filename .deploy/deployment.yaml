@@ -1,0 +1,129 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ingress
+  labels:
+    app: ingress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ingress
+  template:
+    metadata:
+      labels:
+        app: ingress
+    spec:
+      containers:
+        - name: ingress
+          image: duccos/egg-egg:latest
+          args:
+            - --service=ingress
+          env:
+            - name: CLICKHOUSE_URI
+              value: tcp://chi-clickhouse-clickhouse-0-0.clickhouse:9000?username=clickhouse_operator&password=clickhouse_operator_password&debug=true
+            - name: LOG_LEVEL
+              value: debug
+            - name: GRPC_ADDRESS
+              value: ":9000"
+          ports:
+            - containerPort: 9000
+              name: grpc
+          resources:
+            limits:
+              memory: 50Mi
+              cpu: 150m
+          volumeMounts:
+            - name: cacerts
+              mountPath: /etc/ssl/cacerts
+              readOnly: true
+      volumes:
+        - name: cacerts
+          hostPath:
+            path: /etc/ssl/certs
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: egress
+  labels:
+    app: egress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: egress
+  template:
+    metadata:
+      labels:
+        app: egress
+    spec:
+      containers:
+        - name: egress
+          image: duccos/egg-egg:latest
+          args:
+            - --service=egress
+          env:
+            - name: CLICKHOUSE_URI
+              value: tcp://chi-clickhouse-clickhouse-0-0.clickhouse:9000?username=clickhouse_operator&password=clickhouse_operator_password&debug=true
+            - name: LOG_LEVEL
+              value: debug
+            - name: GRPC_ADDRESS
+              value: ":9000"
+          ports:
+            - containerPort: 9000
+              name: grpc
+          resources:
+            limits:
+              memory: 50Mi
+              cpu: 150m
+          volumeMounts:
+            - name: cacerts
+              mountPath: /etc/ssl/cacerts
+              readOnly: true
+      volumes:
+        - name: cacerts
+          hostPath:
+            path: /etc/ssl/certs
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rest
+  labels:
+    app: rest
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rest
+  template:
+    metadata:
+      labels:
+        app: rest
+    spec:
+      containers:
+        - name: rest
+          image: duccos/egg-rest:latest
+          env:
+            - name: LOG_LEVEL
+              value: debug
+            - name: GRPC_ADDRESS
+              value: "ingress.egg:9000"
+            - name: REST_ADDRESS
+              value: ":8080"
+          ports:
+            - containerPort: 8080
+              name: http
+          resources:
+            limits:
+              memory: 50Mi
+              cpu: 150m
+          volumeMounts:
+            - name: cacerts
+              mountPath: /etc/ssl/cacerts
+              readOnly: true
+      volumes:
+        - name: cacerts
+          hostPath:
+            path: /etc/ssl/certs

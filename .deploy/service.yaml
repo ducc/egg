@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingress
+spec:
+  selector:
+    app: ingress
+  ports:
+    - protocol: TCP
+      port: 9000
+      targetPort: 9000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: egress
+spec:
+  selector:
+    app: engress
+  ports:
+    - protocol: TCP
+      port: 9000
+      targetPort: 9000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rest
+spec:
+  selector:
+    app: rest
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
