@@ -1,0 +1,30 @@
+name: Egg
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  build_and_push:
+    name: Build and Push
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        service: [egg, rest]
+    
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      
+      - name: Docker build
+        run: docker build -t ducc/egg-${{ matrix.service }}:$GITHUB_SHA -f Dockerfile.${{ matrix.service }}
+      
+      - name: Docker login
+        if: github.ref == 'refs/heads/master'
+        run: echo ${{ secrets.DOCKER_ACCESS_TOKEN }} | docker login -u duccos --password-stdin
+
+      - name: Docker push egg
+        if: github.ref == 'refs/heads/master'
+        run: docker push ducc/egg-${{ matrix.service }}:$GITHUB_SHA
+      

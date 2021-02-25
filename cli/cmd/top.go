@@ -15,11 +15,15 @@ import (
 	"google.golang.org/grpc"
 )
 
-var address string
+var (
+	address string
+	verbose bool
+)
 
 func init() {
 	rootCmd.AddCommand(topCmd)
 	topCmd.PersistentFlags().StringVarP(&address, "address", "a", "localhost:9000", "egg egress grpc address")
+	topCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "output lots more overly verbose info")
 }
 
 var topCmd = &cobra.Command{
@@ -58,6 +62,20 @@ Last seen: %s
 Hash: %s
 `
 		msg += fmt.Sprintf(format, result.GetCount(), result.Error.Message, firstSeen, lastSeen, result.Error.Hash)
+
+		if verbose && len(result.Error.Data) > 0 {
+			var i int
+			for k, v := range result.Error.Data {
+				if i == 0 {
+					msg += "Data: "
+				} else {
+					msg += "      "
+				}
+
+				msg += k + " = " + v + "\n"
+				i++
+			}
+		}
 
 		if result.Error.Data["sentry"] != "" {
 			var sentryEvent sentry.Event
