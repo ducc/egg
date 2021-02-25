@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v2
       
       - name: Docker build
-        run: docker build -t ducc/egg-${{ matrix.service }}:$GITHUB_SHA -f Dockerfile.${{ matrix.service }}
+        run: docker build -t ducc/egg-${{ matrix.service }}:$GITHUB_SHA -f Dockerfile.${{ matrix.service }} .
       
       - name: Docker login
         if: github.ref == 'refs/heads/master'
