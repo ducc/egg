@@ -5,6 +5,7 @@ import (
 	"crypto/sha1"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"encoding/base64"
 	"encoding/json"
@@ -75,6 +76,11 @@ func (s *server) HandleIngest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type Event struct {
+	Message   string             `json:"message,omitempty"`
+	Exception []sentry.Exception `json:"exception,omitempty"`
+}
+
 func (s *server) HandleSentryIngest(w http.ResponseWriter, r *http.Request) {
 	logrus.Debug(r)
 
@@ -86,7 +92,7 @@ func (s *server) HandleSentryIngest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var sentryEvent sentry.Event
+	var sentryEvent Event
 	if err := json.Unmarshal(body, &sentryEvent); err != nil {
 		logrus.WithError(err).Error("unmarshalling event")
 		w.WriteHeader(400)
@@ -108,7 +114,7 @@ func (s *server) HandleSentryIngest(w http.ResponseWriter, r *http.Request) {
 
 	hash := base64.StdEncoding.EncodeToString(sha1.New().Sum([]byte(message)))
 
-	ts, err := ptypes.TimestampProto(sentryEvent.Timestamp)
+	ts, err := ptypes.TimestampProto(time.Now())
 	if err != nil {
 		logrus.WithError(err).WithField("sentry", sentryEvent).Error("converting tme.Time to *timestamp.Timestamp")
 		w.WriteHeader(400)
