@@ -32,6 +32,8 @@ func main() {
 		logrus.SetLevel(ll)
 	}
 
+	logrus.Info("connecting to grpc client: ", env.GrpcAddress())
+
 	conn, err := grpc.DialContext(ctx, env.GrpcAddress(), grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		panic(err)
@@ -40,6 +42,8 @@ func main() {
 	client := protos.NewIngressClient(conn)
 	server := &server{client: client}
 
+	logrus.Info("creating router")
+
 	r := mux.NewRouter()
 
 	r.HandleFunc("/ingest", server.HandleIngest).Methods("POST")
@@ -47,7 +51,7 @@ func main() {
 	// sentry
 	r.HandleFunc("/api/{project_id}/store/", server.HandleSentryIngest).Methods("POST")
 
-	logrus.Info("running")
+	logrus.Info("listening for http: ", env.RestAddress())
 
 	if err := http.ListenAndServe(env.RestAddress(), r); err != nil {
 		panic(err)

@@ -22,10 +22,14 @@ func main() {
 		logrus.SetLevel(ll)
 	}
 
+	logrus.Info("connecting to db: ", env.ClickHouseURI())
+
 	db, err := database.New(ctx)
 	if err != nil {
 		panic(err)
 	}
+
+	logrus.Info("starting grpc server")
 
 	grpcServer := grpc.NewServer()
 
@@ -43,6 +47,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	logrus.Info("serving grpc: ", env.GrpcAddress())
 
 	if err := grpcServer.Serve(listener); err != nil {
 		panic(err)
