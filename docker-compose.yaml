@@ -7,7 +7,7 @@ services:
   egg:
     build: 
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.egg.dev
     ports: 
       - "9000:9000"
     depends_on:
@@ -18,3 +18,18 @@ services:
       LOG_LEVEL: debug
       GRPC_ADDRESS: ":9000"
       CLICKHOUSE_URI: "tcp://clickhouse:9000?debug=true"
+  rest:
+    build:
+      context: .
+      dockerfile: Dockerfile.rest.dev
+    ports: 
+      - "8080:8080"
+    depends_on:
+      - egg
+    volumes:
+      - .:/src
+    environment:
+      LOG_LEVEL: debug
+      GRPC_ADDRESS: "egg:9000"
+      REST_ADDRESS: ":8080"
+

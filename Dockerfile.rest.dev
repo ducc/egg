@@ -1,0 +1,10 @@
+FROM golang:1.15.6-buster as builder
+
+WORKDIR /src
+
+COPY . .
+
+RUN ["go", "get", "github.com/cespare/reflex"]
+RUN go mod vendor
+
+ENTRYPOINT reflex -s -- sh -c 'go run -mod=vendor cmd/rest/main.go'

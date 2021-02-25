@@ -1,0 +1,21 @@
+FROM golang:1.15.6-buster as builder
+
+WORKDIR /src
+
+COPY . .
+
+RUN CGO_ENABLED=0 go build -a -mod=vendor -o /egg cmd/rest/main.go
+
+#---------------------------------------#
+
+FROM alpine:3.12 as release
+
+RUN apk add --update ca-certificates openssl curl
+
+COPY --from=builder /egg /
+
+RUN adduser -D svc
+RUN chown -R svc /egg /usr/local/share
+USER svc
+
+ENTRYPOINT ["/egg"]
