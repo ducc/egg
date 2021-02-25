@@ -21,7 +21,7 @@ egg has 1st class support for sentry SDKs so you dont have to change any code to
 1. web: you can make it and pr it
 
 ## deploying on kubernetes
-here's how you deploy it on kubernetes
+you can find instructions and manifests [here](https://github.com/ducc/egg/tree/master/.deploy)
 
 ## development
 run `docker-compose up` to get egg running locally. when you save a file it will be restarted (think `npm start` hot reloading in react)
